@@ -146,15 +146,30 @@ module.exports.Key = (function () {
             this.e = _.isNumber(E) ? E : utils.get32IntFromBuffer(E, 0);
             this.d = new BigInteger(D);
 
-            if (P && Q && DP && DQ && C) {
+            if (P && Q) {
                 this.p = new BigInteger(P);
                 this.q = new BigInteger(Q);
-                this.dmp1 = new BigInteger(DP);
-                this.dmq1 = new BigInteger(DQ);
-                this.coeff = new BigInteger(C);
-            } else {
-                // TODO: re-calculate any missing CRT params
             }
+
+            if (DP)
+                this.dmp1 = new BigInteger(DP);
+            else {
+                var p1 = this.p.subtract(BigInteger.ONE);
+                this.dmp1 = this.d.mod(p1);
+            }
+
+            if (DQ)
+                this.dmq1 = new BigInteger(DQ);
+            else {
+                var q1 = this.q.subtract(BigInteger.ONE);
+                this.dmq1 = this.d.mod(q1);
+            }
+
+            if (C)
+                this.coeff = new BigInteger(C);
+            else
+                this.coeff = this.q.modInverse(this.p);
+
             this.$$recalculateCache();
         } else {
             throw Error("Invalid RSA private key");
@@ -218,8 +233,8 @@ module.exports.Key = (function () {
         var buffers = [];
         var results = [];
         var bufferSize = buffer.length;
-        var buffersCount = Math.ceil(bufferSize / this.maxMessageLength) || 1; // total buffers count for encrypt
-        var dividedSize = Math.ceil(bufferSize / buffersCount || 1); // each buffer size
+        var buffersCount = Math.floor(bufferSize / this.maxMessageLength) || 1; // total buffers count for encrypt
+        var dividedSize = Math.floor(bufferSize / buffersCount || 1); // each buffer size
 
         if (buffersCount == 1) {
             buffers.push(buffer);

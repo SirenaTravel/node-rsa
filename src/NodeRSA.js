@@ -72,7 +72,10 @@ module.exports = (function () {
         if (Buffer.isBuffer(key) || _.isString(key)) {
             this.importKey(key, format);
         } else if (_.isObject(key)) {
-            this.generateKeyPair(key.b, key.e);
+            if (key.b && key.e)
+                this.generateKeyPair(key.b, key.e);
+            else
+                this.importKey(key, format);
         }
 
         this.setOptions(options);
