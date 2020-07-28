@@ -16,7 +16,7 @@ module.exports = {
     },
 
     privateImport: function (key, data, options) {
-        if (data.n && data.e && data.d && data.p && data.q && data.dmp1 && data.dmq1 && data.coeff) {
+        if (data.n && data.e && data.d && data.p && data.q) {
             key.setPrivate(
                 data.n,
                 data.e,
@@ -57,7 +57,7 @@ module.exports = {
      */
     autoImport: function (key, data) {
         if (data.n && data.e) {
-            if (data.d && data.p && data.q && data.dmp1 && data.dmq1 && data.coeff) {
+            if (data.d && data.p && data.q) {
                 module.exports.privateImport(key, data);
                 return true;
             } else {
